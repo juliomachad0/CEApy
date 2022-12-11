@@ -1,0 +1,22 @@
+problem case=L22_analise_nitrometano
+
+   rocket equilibrium frozen nfz=3
+
+ p,bar=10,
+
+ sup,ae/at=250,
+
+ o/f=0.5,0.75,1,1.5,2,2.5,3,3.5,4,4.5,5,
+
+react
+
+ fuel=CH3NO2(L) wt=100 t,k=298.15
+
+ oxid=N2O wt=100 t,k=300
+
+output siunits short transpot
+
+    plot isp cf o/f aeat
+
+end
+

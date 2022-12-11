@@ -1,0 +1,6 @@
+tests/
+.venvCEApy/
+.idea/
+dist/
+build/
+*.egg-info
