@@ -1,0 +1,1 @@
+CreateObject("Wscript.Shell").Run "cea_python.bat", 0, True
