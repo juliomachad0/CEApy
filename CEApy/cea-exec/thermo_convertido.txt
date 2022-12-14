@@ -1,6 +1,3 @@
-julio machado, julioromac@outlook.com
-portuguese: lista de especies disponiveis na biblioteca thermo.inp
-english: list of species available in the thermo.inp librarye-
 Ag
 Ag+
 Ag-

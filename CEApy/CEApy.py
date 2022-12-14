@@ -1,14 +1,16 @@
 import os
 import pandas as pd
+import logging as log
+from time import sleep
+log.basicConfig(level=log.INFO)
+
 
 class CEA:
-    def __init__(self, thrust, name="CEA_Analysis"):
+    def __init__(self, name="CEA_Analysis"):
         # arquivo e nome do estudo
         self.caminho_raiz = str(os.path.dirname(__file__))
-        print("\n\n\ncaminho raiz: {}\n".format(self.caminho_raiz))
         self.case = str(name)
         self.file_name = self.case + '.inp'
-        # open('cea-exec/{}'.format(self.file_name), 'w')  # criando arquivo .inp
         self.input_text = []  # lista de input CEA
         self.input_text_string = ''  # string de input CEA
         # parametros de configuração
@@ -18,7 +20,7 @@ class CEA:
         self.short = 0
         self.intermediate = 0
         self.transport = 0
-        self.nominal_thrust = thrust  # newton
+        self.nominal_thrust = None  # newton
         self.equi = 1
         self.chamber_pressure = []  # bar
         # propelentes
@@ -53,7 +55,7 @@ class CEA:
 
     def search_specie(self, words):
         os.chdir(self.caminho_raiz)
-        thermo = open('cea-exec/thermo.txt', 'r')
+        thermo = open('cea-exec/thermo_convertido.txt', 'r')
         linhas = thermo.readlines()
         cont = 1
         for linha in linhas:
@@ -65,7 +67,7 @@ class CEA:
 
     def show_all_species(self):
         os.chdir(self.caminho_raiz)
-        thermo = open('cea-exec/thermo.txt', 'r')
+        thermo = open('cea-exec/thermo_convertido.txt', 'r')
         linhas = thermo.readlines()
         cont = 1
         print('All THE SPECIES AVAILABLE IN CEA\nTHERMODYNAMICAL DATABASE:\n')
@@ -297,12 +299,10 @@ class CEA:
         self.input_text.append('end\n')
 
         # **** GRAVANDO NO ARQUIVO E EXECUTANTO ****
-
         # configurando arquivo de input
         os.chdir(self.caminho_raiz)
         with open('cea-exec/cea_python_input.txt', 'w') as inputbat:
             inputbat.write(self.case)
-
         # excluindo arquivos anteriores
         if os.path.exists('cea-exec/{}.inp'.format(self.case)):
             os.remove('cea-exec/{}.inp'.format(self.case))
@@ -316,32 +316,104 @@ class CEA:
         if os.path.exists('cea-exec/{}.csv'.format(self.case)):
             os.remove('cea-exec/{}.csv'.format(self.case))
             # arquivos .csv
-
         # gravando no arquivo .inp
         arquivo = open('cea-exec/{}'.format(self.file_name), 'w')
         for i in self.input_text:
             self.input_text_string = self.input_text_string + str(i) + '\n'
         arquivo.write(self.input_text_string)
         arquivo.close()
-
         # executando bat file
         os.chdir(self.caminho_raiz+'/cea-exec/')
         os.startfile("cea_python.vbs")
         os.chdir(self.caminho_raiz)
-
         # limpando variaveis
         self.input_text = []
         self.input_text_string = ''
-
-    def get_results(self):
-        os.chdir(self.caminho_raiz)
-        df = pd.read_csv('cea-exec/{}.csv'.format(self.case))
-        for i in df.columns:
-            df.rename(columns={i: str(i).strip()}, inplace=True)
-        return df
+        sleep(1.5)
 
     def vizualize_output_file(self):
         os.chdir(self.caminho_raiz)
         arquivo = open('cea-exec/{}.out'.format(self.case), 'r')
-        arquivo = str(arquivo)
-        print(arquivo)
+        arquivo = arquivo.readlines()
+        for i in arquivo:
+            print(i)
+
+    def get_results(self, column_names, condition):
+        if type(condition) is str:
+            condition = str(condition).lower()
+        if type(column_names) is str:
+            column_names = str(column_names).lower()
+        # getting data.csv
+        os.chdir(self.caminho_raiz)
+        df = pd.read_csv('cea-exec/{}.csv'.format(self.case))
+        # rename properly
+        for i in df.columns:
+            df.rename(columns={i: str(i).strip()}, inplace=True)
+
+        # if all columns with all data are requested
+        if (column_names == 'all') and (condition == 'all'):
+            return df
+        # if all columns with specific condition are requested
+        elif (column_names == 'all') and (condition != 'all'):
+            if (condition == 'combustor') or (condition == 1):
+                return data_exit_condition(df, 0)
+            elif (condition == 'throat') or (condition == 2):
+                return data_exit_condition(df, 1)
+            elif (condition == 'exit') or (condition == 3):
+                if condition == 'exit':
+                    return data_exit_condition(df, 2)
+                else:
+                    return data_exit_condition(df, condition-1)
+            else:
+                log.error("\nCondition not informed properly, options:\n"
+                          "All, ALL, all, exit, combustor, throat, 1, 2, 3 ...\n")
+                return
+        # if specific columns are requested with specific condition
+        elif type(column_names) is list:
+            # building desired df
+            vectors_list_names = []
+            for i in column_names:
+                if i in df.columns:
+                    for j in df.columns:
+                        if i == j:
+                            vectors_list_names.append(j)
+                else:
+                    log.error("\n{} is not in results\n".format(i))
+                    print('column names available in results: {}\n'.format(df.columns))
+                    return
+            new_df = df[vectors_list_names]
+
+            if (condition == 'combustor') or (condition == 1):
+                return data_exit_condition(new_df, 0)
+            elif (condition == 'throat') or (condition == 2):
+                return data_exit_condition(new_df, 1)
+            elif (condition == 'exit') or (condition == 3):
+                if condition == 'exit':
+                    return data_exit_condition(new_df, 2)
+                else:
+                    return data_exit_condition(new_df, condition-1)
+            elif condition == 'all':
+                return new_df
+            else:
+                log.error("\nCondition not informed properly, options:\n"
+                          "All, ALL, all, exit, combustor, throat, 1, 2, 3 ...\n")
+                return
+        else:
+            log.error("Column names are not informed properly, options:\n"
+                      "All, ALL, all or list with specific names of columns\n")
+            return
+
+
+def data_exit_condition(df, cond):
+    df_new = None
+    c = 0
+    for cln in df.columns:
+        cl = []
+        for j in range(cond, len(df[cln]), 3):
+            cl.append(df[cln][j])
+        if c == 0:
+            df_new = pd.DataFrame(cl, columns=[cln])
+        else:
+            df_new[cln] = cl
+        c = c + 1
+    return df_new
