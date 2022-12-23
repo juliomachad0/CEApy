@@ -11,7 +11,7 @@ setup(
     ],
     author="Julio C. R. Machado",
     author_email=["julioromac@outlook.com", "machado.juliocr@gmail.com"],
-    description="Library to automate analyzes in CEA NASA",
+    description="Library to automate analyzes in CEA NASA - Under development",
     url="https://github.com/juliomachad0/CEApy.git",
     packages=find_packages(include=['CEApy']),
     classifiers=[

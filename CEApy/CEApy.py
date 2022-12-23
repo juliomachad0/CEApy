@@ -28,6 +28,8 @@ class CEA:
         self.__intermediate = 0
         # transport properties, conditions
         self.__transport = 0
+        # data exit, to avoid static method
+        self.__df_new = None
 
         # PROPELLANT
         # propellants variables
@@ -143,7 +145,7 @@ class CEA:
 
     def input_propellants(self, oxid=None, fuel=None):
         # assessing oxid coherence
-        if type(oxid) is not None:
+        if oxid is not None:
             for i in oxid:
                 if len(i) == 3:
                     if (type(i[0]) is str) and (type(i[1]) is int or float) and (type(i[2]) is int or float):
@@ -455,9 +457,9 @@ class CEA:
         if '%f' in user_outputs:
             self.__out_fbw_ratio = 1  # %f
         if 'o/f' in user_outputs:
-            self.__out_of_ratio = 0  # o/f
+            self.__out_of_ratio = 1  # o/f
         if 'phi,eq.ratio' in user_outputs:
-            self.__out_phi_eq_ratio = 0  # phi,eq.ratio
+            self.__out_phi_eq_ratio = 1  # phi,eq.ratio
         if 'r,eq.ratio' in user_outputs:
             self.__out_chem_eq_ratio = 1  # r,eq.ratio
         self.__output_parameters_condition = 1
@@ -902,7 +904,7 @@ class CEA:
             self.show_out_file()
 
     def __data_exit_condition(self, df, cond):
-        df_new = None
+        df_new = self.__df_new
         c = 0
         for cln in df.columns:
             cl = []
@@ -913,7 +915,6 @@ class CEA:
             else:
                 df_new[cln] = cl
             c = c + 1
-        print("\nCEA:         case: {} Results: ".format(self.__case))
         return df_new
 
     def show_out_file(self):
