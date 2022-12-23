@@ -4,3 +4,4 @@ tests/
 dist/
 build/
 *.egg-info
+*.docx
