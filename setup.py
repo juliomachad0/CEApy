@@ -10,7 +10,7 @@ setup(
             "matplotlib>=3.6.2"
     ],
     author="Julio C. R. Machado",
-    author_email=["julioromac@outlook.com", "machado.juliocr@gmail.com"],
+    author_email="julioromac@outlook.com",
     description="Library to automate analyzes in CEA NASA - Under development",
     url="https://github.com/juliomachad0/CEApy.git",
     packages=find_packages(include=['CEApy']),
