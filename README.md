@@ -1,6 +1,6 @@
 # Chemical Equilibrium With Application in Python - CEApy
 
-**_Version:_** 1.0.0 (_Under development_), December 26, 2022
+**_Version:_** 1.0.0 (_Under development_), December 26, 2022  
 
 **_Short Description:_** Python library that automates analysis of rocket problems in  
 CEA-NASA, which for now only works on Windows.  
@@ -10,8 +10,9 @@ Undergraduate student in the last period of the aerospace engineering course
 at Federal University of Maranhão - Brazil.
 
 **_Emails_**: julioromac@outlok.com, machado.juliocr@gmail.com, machado.julio@discente.ufma.br
-
-#### _Long Description_:
+### _Install:_
+    pip install CEApy
+#### _Long Description:_
         The library was developed to be embedded in other libraries, allowing automatic analysis
     of the combustion process in rocket engine chambers. In its first version, it is possible to
     analyze all combinations of compounds available in the thermodynamic library of CEA, which h
@@ -30,7 +31,7 @@ at Federal University of Maranhão - Brazil.
 
 ## &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp; _Methods_
 
-### _importing_
+### _importing:_
     from CEApy import CEA
 ### _Methods Available:_
     combustion = CEA("My_first_Analysis")
