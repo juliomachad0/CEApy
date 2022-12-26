@@ -108,33 +108,46 @@ class CEA:
         os.chdir(self.__caminho_raiz)
         thermo = open('cea-exec/thermo_convertido.txt', 'r')
         linhas = thermo.readlines()
-        cont = 0
+        cont = 1
+        print("CEA: Search Species Method. Species found:")
+        print("******************************************\n")
         for linha in linhas:
             if words in linha:
                 print('Result {}: '.format(cont) + linha)
                 cont = cont + 1
+            else:
+                pass
+        print("******************************************\n")
         if cont == 0:
             log.info("CEA: Search specie method\nNO ONE {} OR SIMILAR SPECIE HAS BEEN FOUND\n")
+            return
+        return
 
     def show_all_species(self):
         os.chdir(self.__caminho_raiz)
         thermo = open('cea-exec/thermo_convertido.txt', 'r')
         linhas = thermo.readlines()
         cont = 1
-        print('CEA: Show all species method\n'
-              'All THE SPECIES AVAILABLE IN CEA\nTHERMODYNAMICAL DATABASE:\n')
+        print('CEA: Show all species method, Analysis: {}\n'
+              'All THE SPECIES AVAILABLE IN CEA\nTHERMODYNAMICAL DATABASE:\n'.format(self.__case))
+        print("******************************************\n")
         for linha in linhas:
             print('Specie {}: '.format(cont) + linha)
             cont = cont + 1
+        print("******************************************\n")
+        return
 
     def __search_input_propellants(self, word):
         os.chdir(self.__caminho_raiz)
         thermo = open('cea-exec/thermo_convertido.txt', 'r')
         linhas = thermo.readlines()
+        thermo.close()
         cont = 0
         for i in linhas:
             if word in i:
                 cont += 1
+            else:
+                pass
         if cont == 0:
             log.error("CEA: NO ONE {} SPECIE HAS BEEN FOUND".format(word))
             log.info("CEA: SIMILAR SPECIES FOUND: \n")
@@ -168,11 +181,12 @@ class CEA:
                               "name must be string, mass fraction and temperature must be float or int\n")
                     self.__propellant_v_condition = 0
                     return
-            #  verifying existence of species
-            for i in oxid:
+                #  verifying existence of species
                 result_search = self.__search_input_propellants(i[0])
                 if result_search == 0:
                     return
+                else:
+                    pass
             #  setting oxidizer
             self.__oxids = oxid
         elif fuel is None:
@@ -184,6 +198,8 @@ class CEA:
                       "name must be string, mass fraction and temperature must be float or int\n")
             self.__propellant_v_condition = 0
             return
+        else:
+            pass
         #  assessing fuel coherence
         if fuel is not None:
             for i in fuel:
@@ -208,8 +224,7 @@ class CEA:
                               "name must be string, mass fraction and temperature must be float or int\n")
                     self.__propellant_v_condition = 0
                     return
-            #  verifying existence of species
-            for i in fuel:
+                #  verifying existence of species
                 result_search = self.__search_input_propellants(i[0])
                 if result_search == 0:
                     return
@@ -224,6 +239,8 @@ class CEA:
                       "name must be string, mass fraction and temperature must be float or int\n")
             self.__propellant_v_condition = 0
             return
+        else:
+            pass
         self.__propellant_v_condition = 1
 
     # input parameters
@@ -527,13 +544,19 @@ class CEA:
 
     def show_inp_file(self, type_f='logical'):
         if type_f == 'logical':
-            if len(type_f) == 0:
+            self.__create_input_text()
+            if len(self.__input_text) == 0:
                 log.info('CEA: Show input file method\n'
                          '{} logical input file is empty\n'.format(self.__case))
+                return
             else:
                 print('CEA: Show input file method\n'
-                      '{} LOGICAL INPUT FILE:\n'.format(self.__case))
-                print(self.__input_text_string)
+                      '{} LOGICAL INPUT FILE:\n'
+                      '***********************************\n'.format(self.__case))
+                for i in self.__input_text:
+                    print(i)
+                print('***********************************\n')
+                return
         elif type_f == 'file':
             # getting data.csv
             os.chdir(self.__caminho_raiz)
@@ -544,17 +567,21 @@ class CEA:
                       '{} INPUT FILE IN THE CEA DIRECTORY:\n'.format(self.__case))
                 for i in file_inp:
                     print(i)
+
+                return
             else:
-                log.info('CEA: Show input file method\n'
-                         '{} input file in the CEA directory do not exists\n'.format(self.__case))
+                log.error('CEA: Show input file method\n'
+                          '{} input file in the CEA directory do not exists\n'.format(self.__case))
+                return
         else:
             log.error("CEA: Show input file method\n"
                       "Wrong option parameter")
             log.warning("CEA: option must be 'logical' or 'file'\n"
                         "- logical: file in the program\n"
                         "- file: file in the directory of CEA\n")
+            return
 
-    def create_input_text(self):
+    def __create_input_text(self):
         # clearing variables
         self.__input_text = []
         self.__input_text_string = ''
@@ -637,12 +664,21 @@ class CEA:
                       "- FUEL PARAMETER IS EMPTY\n"
                       "- Oxid must be a list inside a list, like:\n"
                       "[[name,mass fraction,temp],[same]] (more than one or [[same]] if just one")
+            self.__propellant_v_condition = 0
+            return
         # adding oxidizers
         if self.__oxids is not None:
             for i in self.__oxids:
                 self.__input_text.append(' oxid={} wt={} t,k={}\n'.format(i[0], i[1], i[2]))
+        else:
+            log.error("CEA: Creating input\n"
+                      "- OXID PARAMETER IS EMPTY\n"
+                      "- Oxid must be a list inside a list, like:\n"
+                      "[[name,mass fraction,temp],[same]] (more than one or [[same]] if just one")
+            self.__propellant_v_condition = 0
+            return
 
-        # ADDING OUTPUTS
+            # ADDING OUTPUTS
         output = 'output siunits'
         if self.__short == 1:
             output = output + ' short'
@@ -713,8 +749,11 @@ class CEA:
         self.__input_text.append(plot + '\n')
         # adding end ot logical input file
         self.__input_text.append('end\n')
+        return
 
-    def remove_analysis_file(self, name):
+    def remove_analysis_file(self, name=None):
+        if name is None:
+            name = self.__case
         os.chdir(self.__caminho_raiz)
         # .inp files
         if os.path.exists('cea-exec/{}.inp'.format(name)):
@@ -752,7 +791,7 @@ class CEA:
             return
         if (stt == 1) and (ipc == 1):
             # creating input file
-            self.create_input_text()
+            self.__create_input_text()
             # writing input file in the folder
             os.chdir(self.__caminho_raiz)
             with open('cea-exec/cea_python_input.txt', 'w') as inputbat:
@@ -925,24 +964,31 @@ class CEA:
             out_file = out_file.readlines()
             for i in out_file:
                 print(i)
+            print("******************************************\n")
         else:
-            log.info("CEA: Show out file\n"
+            log.error("CEA: Show out file\n"
                      "{} output file in the CEA directory do not exists\n".format(self.__case))
 
-    def get_simulation_file(self, type_file):
+    def get_simulation_file(self, type_file='out'):
         os.chdir(self.__caminho_raiz)
         if type_file == 'out':
             if os.path.exists('cea-exec/{}.out'.format(self.__case)):
                 out_file = open('cea-exec/{}.out'.format(self.__case), 'r')
                 out_file = out_file.readlines()
-                return out_file
+                string_file_results_simulation_out = ''
+                for i in out_file:
+                    string_file_results_simulation_out = string_file_results_simulation_out + str(i) + '\n'
+                return string_file_results_simulation_out
             else:
                 log.error('CEA: {} output file in the CEA directory do not exists\n'.format(self.__case))
         elif type_file == 'inp':
             if os.path.exists('cea-exec/{}'.format(self.__file_name)):
                 file_inp = open('cea-exec/{}.inp'.format(self.__case), 'r')
                 file_inp = file_inp.readlines()
-                return file_inp
+                string_file_results_simulation_inp = ''
+                for i in file_inp:
+                    string_file_results_simulation_inp = string_file_results_simulation_inp + str(i) + '\n'
+                return string_file_results_simulation_inp
             else:
                 log.error('CEA: {} input file in the CEA directory do not exists\n'.format(self.__case))
         else:
