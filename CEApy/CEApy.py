@@ -683,7 +683,7 @@ class CEA:
         if self.__short == 1:
             output = output + ' short'
         if self.__transport == 1:
-            output = output + ' transpot'
+            output = output + ' transport'
         self.__input_text.append(output + '\n')
         # ADDING PLOTS
         plot = '    plot'

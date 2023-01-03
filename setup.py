@@ -6,7 +6,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name="CEApy",
-    version="1.0.0",
+    version="1.0.1",
     install_requires=[
             "pandas>=1.5.2",
     ],
@@ -20,7 +20,7 @@ setup(
     classifiers=[
         "Programming Language :: Python :: 3.11",
         "License :: OSI Approved :: MIT License",
-        "Operating System :: Windows",
+        "Operating System :: OS Independent",
     ],
     python_requires=">=3.10",
     include_package_data=True,
