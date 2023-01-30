@@ -6,7 +6,7 @@ long_description = (this_directory / "README.md").read_text()
 
 setup(
     name="CEApy",
-    version="1.0.3",
+    version="1.0.4",
     install_requires=[
             "pandas>=1.5.2",
     ],

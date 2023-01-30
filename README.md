@@ -1,6 +1,6 @@
 # Chemical Equilibrium With Application in Python - CEApy
 
-**_Version:_** 1.0.1 (_Under development_), December 26, 2022  
+**_Version:_** 1.0.4 (_Under development_), December 26, 2022  
 
 **_Short Description:_** Python library that automates analysis of rocket problems in  
 CEA-NASA, which for now only works on Windows.  
