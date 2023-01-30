@@ -628,7 +628,7 @@ class CEA:
 
         # adding acat
         if self.__acat_cond == 1:
-            acat_inp = ' ac/at='
+            acat_inp = 'fac ac/at='
             for i in self.__acat:
                 acat_inp = acat_inp + ('{},'.format(i))
             self.__input_text.append(acat_inp + '\n')
