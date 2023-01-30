@@ -299,7 +299,7 @@ class CEA:
             else:
                 self.__input_parameters_condition = 0
                 return
-        # acat
+        # acat - contraction ratio from stagnation values to throat
         if acat is not None:
             result = self.__islist(acat)
             if result == 1:
