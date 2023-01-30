@@ -85,7 +85,7 @@ at Federal University of Maranhão - Brazil.
           oxid = [['N2O4(L)',50,298.15]]
     - fuel: fill in the same way as the oxidizer.
 ### _input_parameters_
-    def input_parameters(self, combustion_temp=3800, chamber_pressure=None, sub_aeat=None,
+    def input_parameters(self, combustion_temp=3800, chamber_pressure=None, acat=None, sub_aeat=None,
                          sup_aeat=None, pipe=None, of_ratio=None, chem_ratio=None,
                          phi_ratio=None, fbyw_ratio=None):
     
@@ -93,6 +93,9 @@ at Federal University of Maranhão - Brazil.
     if one: sup_aeat = [100], of = [3]
     - fbyw: fuel by weight ratio, for better undertanding of parameters, see
     McBride and Gordon, 1994) and (McBride and Gordon, 1996 ).
+    - acat: contraction ratio from stagnation values to throat
+    - sub_aeat: subsonic expansion ratio
+    - sup_aeat: supersonic expansion ratio
 
     - example:
         CEA.input_parameters(chamber_pressure=[10],sup_aeat=[10,20],of_ratio=[1,2,3])

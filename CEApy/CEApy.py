@@ -43,6 +43,7 @@ class CEA:
         self.__input_parameters_condition = 0
         # condition
         self.__chamber_pressure_cond = 0  # 0 disable, 1 enable
+        self.__acat_cond = 0      # 0 disable, 1 enable
         self.__sub_aeat_cond = 0  # 0 disable, 1 enable
         self.__sup_aeat_cond = 0  # 0 disable, 1 enable
         self.__pipe_cond = 0  # 0 disable, 1 enable
@@ -54,6 +55,7 @@ class CEA:
         # values
         self.__combustion_temp = 3800  # standard temperature of CEA
         self.__chamber_pressure = []  # bar
+        self.__acat = []       # contraction ratio of stagnation to throat
         self.__sub_aeat = []  # subsonic expansion ratio of divergent
         self.__sup_aeat = []  # supersonic expansion ratio of divergent
         self.__pipe = []  # pressure ratio p_in/p_exit
@@ -255,11 +257,12 @@ class CEA:
                         "- Instruction: if just one value -> chamber_pressure=[p1]\n")
             return 0
 
-    def input_parameters(self, combustion_temp=3800, chamber_pressure=None, sub_aeat=None,
+    def input_parameters(self, combustion_temp=3800, chamber_pressure=None, acat=None, sub_aeat=None,
                          sup_aeat=None, pipe=None, of_ratio=None, chem_ratio=None,
                          phi_ratio=None, fbyw_ratio=None):
         # reset conditions
         self.__chamber_pressure_cond = 0  # 0 disable, 1 enable
+        self.__acat_cond = 0      # 0 disable, 1 enable
         self.__sub_aeat_cond = 0  # 0 disable, 1 enable
         self.__sup_aeat_cond = 0  # 0 disable, 1 enable
         self.__pipe_cond = 0  # 0 disable, 1 enable
@@ -293,6 +296,15 @@ class CEA:
             if result == 1:
                 self.__chamber_pressure_cond = 1
                 self.__chamber_pressure = chamber_pressure
+            else:
+                self.__input_parameters_condition = 0
+                return
+        # acat
+        if acat is not None:
+            result = self.__islist(acat)
+            if result == 1:
+                self.__acat_cond = 1
+                self.__acat = acat
             else:
                 self.__input_parameters_condition = 0
                 return
@@ -614,12 +626,19 @@ class CEA:
                 pipe = pipe + ('{},'.format(i))
             self.__input_text.append(pipe + '\n')
 
+        # adding acat
+        if self.__acat_cond == 1:
+            acat_inp = ' ac/at='
+            for i in self.__acat:
+                acat_inp = acat_inp + ('{},'.format(i))
+            self.__input_text.append(acat_inp + '\n')
+
         # adding aeat subsonic
         if self.__sub_aeat_cond == 1:
             aeatsub = ' sub,ae/at='
             for i in self.__sub_aeat:
                 aeatsub = aeatsub + ('{},'.format(i))
-            # self.input_text.append(aeatsub + '\n')
+            self.__input_text.append(aeatsub + '\n')
 
         # adding aeat supersonic
         if self.__sup_aeat_cond == 1:
