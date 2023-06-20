@@ -181,34 +181,127 @@ at Federal University of Maranhão - Brazil.
     good to look at the output file name of the analysis.out and see if there are
     errors, through the show_out_file method.
 
-## EXAMPLE: 
+## EXAMPLE:
+    Code:
+```
     from CEApy import CEA
     import matplotlib.pyplot as plt
+    # Evaluating Isp behavior as a function of propellant mixing rate
     
-    combustion = CEA("My_first_Analysis")
+    # creating
+    reaction = CEA()
+    reaction.settings()
     
-    combustion.settings() # adding settings
+    # STUDY 1
+    
     # adding propellants
-    combustion.input_propellants(oxid=[['O2(L)', 100, 90.17]], fuel=[['RP-1', 100, 298.15]])
+    reaction.input_propellants(oxid=[['O2(L)', 100, 90.17]], fuel=[['H2(L)', 100, 20.27]])
     # adding input parameters
-    combustion.input_parameters(sup_aeat=[200], chamber_pressure=[10],
-                                of_ratio=[0.5, 1, 2, 3])
+    exp_ratio = 20 # nozzle expansion rate
+    p_c = 100 # chamber pressure, bar
+    of_ratio = [0.5, 1, 2, 3, 4, 5, 6, 7, 8] # propellant mixing rate
+    reaction.input_parameters(sup_aeat=[exp_ratio],
+                              chamber_pressure=[p_c],
+                              of_ratio=of_ratio)
     # adding output parameters
-    combustion.output_parameters(user_outputs=['isp', 'cf', 'o/f'])
+    reaction.output_parameters(user_outputs=['isp', 'cf', 'o/f'])
+    
+    # input file of CEA engine
+    reaction.show_inp_file()
     # running analyses 
-    combustion.run()
+    reaction.run()
+    # output file of cea engine
+    reaction.show_out_file()
+    
     # getting results
-    df = combustion.get_results()
+    df = reaction.get_results()
+    print('df.head() of simulation results')
+    print(df.head())
+    
     # plotting o/f x isp
     df['isp'] = df['isp']/9.81
+    print('simulation results')
     print(df)
-    plt.plot(df['o/f'], df['isp'])
-    plt.title('O/F x Isp (s), sup_aeat=200, pc = 10 bar')
+    plt.plot(df['o/f'], df['isp'],label='Isp (s)',color='red')
+    plt.title('O/F x Isp (s), Supersonic expansion ratio = {}, Pc = {} bar'.format(exp_ratio,p_c))
     plt.xlabel('O/F')
     plt.ylabel('Isp (s)')
-    plt.legend('isp')
+    plt.legend()
+    plt.savefig("study1_100bar.png",dpi=300,format="png")
     plt.show()
+    plt.close()
+    
     # getting output file to save if necessary
-    strings = combustion.get_simulation_file('out')
+    strings = reaction.get_simulation_file('out')
+    
+    #*********************************************
+    # RUNNING NEW STUDY
+    
+    reaction.input_propellants(oxid=[['O2(L)', 100, 90.17]], fuel=[['H2(L)', 100, 20.27]]) #same
+    p_c2= 200 # chamber pressure, bar, modification 100 -> 200 bar
+    reaction.input_parameters(sup_aeat=[exp_ratio],
+                              chamber_pressure=[p_c2],
+                              of_ratio=of_ratio)
+    reaction.output_parameters(user_outputs=['isp', 'o/f'])
+    
+    # running
+    reaction.run()
+    
+    # getting results
+    df_study2 = reaction.get_results()
+    df_study2['isp'] = df_study2['isp']/9.81
+    print("df_study2 head")
+    print(df_study2.head())
+    
+    # comparing
+    plt.plot(df['o/f'], df['isp'],label='pressure = {}'.format(p_c))
+    plt.plot(df_study2['o/f'], df_study2['isp'],label='pressure = {}'.format(p_c2))
+    plt.title('O/F x Isp (s), Supersonic expansion ratio = {}'.format(exp_ratio))
+    plt.xlabel('O/F')
+    plt.ylabel('Isp (s)')
+    plt.legend()
+    plt.savefig("study2_200bar.png",dpi=300,format="png")
+    plt.show()
+    plt.close()
+    
+    #*******************************************
+    # RUNNIG STUDY WITH FUEL MODIFICATION
+    # configuring propellants
+    liq_hydrogen = ['H2(L)', 50, 20.27] # half the total amount of propellant
+    RP_1 = ['RP-1', 50, 298.15] # half the total amount of propellant
+    
+    # configuring analysis 
+    reaction.input_propellants(oxid=[['O2(L)', 100, 90.17]], fuel=[RP_1,liq_hydrogen])
+    
+    reaction.input_parameters(sup_aeat=[exp_ratio],chamber_pressure=[p_c2],of_ratio=of_ratio)
+    reaction.output_parameters(user_outputs=['isp', 'o/f'])
+    
+    # running
+    reaction.run()
+    
+    # getting results
+    df_study3 = reaction.get_results()
+    df_study3['isp'] = df_study3['isp']/9.81
+    
+    print("df_study3 head")
+    print(df_study3.head())
+    
+    # comparing
+    plt.plot(df['o/f'], df['isp'],label='fuel = H2(L), pressure = {}'.format(p_c))
+    plt.plot(df_study2['o/f'], df_study2['isp'],label='fuel = H2(L), pressure = {}'.format(p_c2))
+    plt.plot(df_study3['o/f'], df_study3['isp'],label='fuel = [H2(L),RP-1], pressure = {}'.format(p_c2))
+    plt.title('O/F x Isp (s), Supersonic expansion ratio = {}'.format(exp_ratio))
+    plt.xlabel('O/F')
+    plt.ylabel('Isp (s)')
+    plt.legend()
+    plt.savefig("study3_H2_RP1_200bar.png",dpi=300,format="png")
+    plt.show()
+    plt.close()
+    
     # deleting analysis files
-    combustion.remove_analysis_file()
+    reaction.remove_analysis_file()
+```
+    Output images:
+![Study 1 - O2(L),H2(l), Pc = 100Bar](doc_images/study1_100bar.png)
+![Study 2 - O2(L),H2(l), Pc = 200Bar](doc_images/study2_200bar.png)
+![Study 3 - O2(L),[H2(l), RP-1], Pc = 200Bar](doc_images/study3_H2_RP1_200bar.png)

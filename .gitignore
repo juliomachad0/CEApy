@@ -1,5 +1,6 @@
 tests/
 .venvCEApy/
+.venv/
 .idea/
 dist/
 build/
