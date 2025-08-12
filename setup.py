@@ -1,4 +1,4 @@
-from setuptools import find_packages, setup
+from setuptools import setup
 from pathlib import Path
 
 this_directory = Path(__file__).parent
@@ -16,7 +16,8 @@ setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     url="https://github.com/juliomachad0/CEApy.git",
-    packages=find_packages(include=['CEApy']),
+    packages=['CEApy'],
+    package_dir={'': '.'},
     classifiers=[
         "Programming Language :: Python :: 3.11",
         "License :: OSI Approved :: MIT License",
